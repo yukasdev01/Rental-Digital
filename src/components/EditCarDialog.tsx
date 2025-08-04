@@ -1,78 +1,52 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
-import { Plus, Upload, Loader2 } from "lucide-react";
+import { Edit, Loader2, Save } from "lucide-react";
 import { useCars } from "@/hooks/useCars";
-import { CreateCarData } from "@/types/car";
+import { Car, UpdateCarData } from "@/types/car";
 
-interface AddCarFormProps {
-  onAddCar?: (car: any) => void; // Opcional agora
+interface EditCarDialogProps {
+  car: Car;
 }
 
-export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
-  const { toast } = useToast();
-  const { addCar, loading } = useCars();
+export const EditCarDialog = ({ car }: EditCarDialogProps) => {
+  const { updateCar, loading } = useCars();
+  const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    category: "",
-    transmission: "",
-    fuel: "",
-    seats: "",
-    image: "",
-    available: true
+    name: car.name,
+    price: car.price.toString(),
+    category: car.category,
+    transmission: car.transmission,
+    fuel: car.fuel,
+    seats: car.seats.toString(),
+    image: car.image,
+    available: car.available
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.price || !formData.category) {
-      toast({
-        title: "Erro",
-        description: "Por favor, preencha todos os campos obrigatórios.",
-        variant: "destructive"
-      });
-      return;
-    }
-
     try {
-      const carData: CreateCarData = {
+      const updateData: UpdateCarData = {
+        id: car.id,
         name: formData.name,
         price: parseFloat(formData.price),
         category: formData.category,
         transmission: formData.transmission,
         fuel: formData.fuel,
         seats: parseInt(formData.seats),
-        image: formData.image || "/placeholder.svg",
+        image: formData.image,
         available: formData.available
       };
 
-      const newCar = await addCar(carData);
-      
-      // Callback opcional para compatibilidade
-      if (onAddCar) {
-        onAddCar(newCar);
-      }
-      
-      // Reset form
-      setFormData({
-        name: "",
-        price: "",
-        category: "",
-        transmission: "",
-        fuel: "",
-        seats: "",
-        image: "",
-        available: true
-      });
+      await updateCar(updateData);
+      setOpen(false);
     } catch (error) {
-      // Erro já tratado no hook
-      console.error('Erro ao adicionar carro:', error);
+      console.error('Erro ao atualizar carro:', error);
     }
   };
 
@@ -84,24 +58,27 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
   };
 
   return (
-    <Card className="w-full max-w-2xl mx-auto bg-card/50 backdrop-blur-sm border-border/50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Plus className="w-5 h-5 text-primary" />
-          Adicionar Novo Carro
-        </CardTitle>
-        <CardDescription>
-          Preencha as informações para adicionar um novo carro ao estoque
-        </CardDescription>
-      </CardHeader>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="icon" variant="outline" className="h-8 w-8">
+          <Edit className="w-4 h-4" />
+        </Button>
+      </DialogTrigger>
       
-      <CardContent>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Editar Carro</DialogTitle>
+          <DialogDescription>
+            Modifique as informações do carro {car.name}
+          </DialogDescription>
+        </DialogHeader>
+        
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome do Carro *</Label>
+              <Label htmlFor="edit-name">Nome do Carro</Label>
               <Input
-                id="name"
+                id="edit-name"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="BMW X5, Mercedes C180..."
@@ -110,9 +87,9 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="price">Preço por dia (R$) *</Label>
+              <Label htmlFor="edit-price">Preço por dia (R$)</Label>
               <Input
-                id="price"
+                id="edit-price"
                 type="number"
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
@@ -124,7 +101,7 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="category">Categoria *</Label>
+              <Label htmlFor="edit-category">Categoria</Label>
               <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
                 <SelectTrigger className="bg-background/50">
                   <SelectValue placeholder="Selecione a categoria" />
@@ -141,7 +118,7 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="transmission">Transmissão</Label>
+              <Label htmlFor="edit-transmission">Transmissão</Label>
               <Select value={formData.transmission} onValueChange={(value) => handleInputChange("transmission", value)}>
                 <SelectTrigger className="bg-background/50">
                   <SelectValue placeholder="Tipo de transmissão" />
@@ -156,7 +133,7 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="fuel">Combustível</Label>
+              <Label htmlFor="edit-fuel">Combustível</Label>
               <Select value={formData.fuel} onValueChange={(value) => handleInputChange("fuel", value)}>
                 <SelectTrigger className="bg-background/50">
                   <SelectValue placeholder="Tipo de combustível" />
@@ -172,7 +149,7 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="seats">Número de Assentos</Label>
+              <Label htmlFor="edit-seats">Número de Assentos</Label>
               <Select value={formData.seats} onValueChange={(value) => handleInputChange("seats", value)}>
                 <SelectTrigger className="bg-background/50">
                   <SelectValue placeholder="Quantidade de assentos" />
@@ -189,40 +166,40 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image">URL da Imagem</Label>
-            <div className="flex gap-2">
-              <Input
-                id="image"
-                value={formData.image}
-                onChange={(e) => handleInputChange("image", e.target.value)}
-                placeholder="https://exemplo.com/imagem-do-carro.jpg"
-                className="bg-background/50"
-              />
-              <Button type="button" variant="outline" size="icon">
-                <Upload className="w-4 h-4" />
-              </Button>
-            </div>
+            <Label htmlFor="edit-image">URL da Imagem</Label>
+            <Input
+              id="edit-image"
+              value={formData.image}
+              onChange={(e) => handleInputChange("image", e.target.value)}
+              placeholder="https://exemplo.com/imagem-do-carro.jpg"
+              className="bg-background/50"
+            />
           </div>
 
           <div className="flex items-center space-x-2">
             <Switch
-              id="available"
+              id="edit-available"
               checked={formData.available}
               onCheckedChange={(checked) => handleInputChange("available", checked)}
             />
-            <Label htmlFor="available">Disponível para aluguel</Label>
+            <Label htmlFor="edit-available">Disponível para aluguel</Label>
           </div>
 
-          <Button type="submit" className="w-full" variant="premium" size="lg" disabled={loading}>
-            {loading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Plus className="w-4 h-4 mr-2" />
-            )}
-            {loading ? "Adicionando..." : "Adicionar Carro ao Estoque"}
-          </Button>
+          <div className="flex gap-3 pt-4">
+            <Button type="submit" className="flex-1" variant="premium" disabled={loading}>
+              {loading ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              {loading ? "Salvando..." : "Salvar Alterações"}
+            </Button>
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancelar
+            </Button>
+          </div>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 };

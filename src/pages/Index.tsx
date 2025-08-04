@@ -6,26 +6,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Car, Search, Filter, MapPin, Phone, Mail } from "lucide-react";
+import { Car as CarIcon, Search, Filter, MapPin, Phone, Mail, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useCars } from "@/hooks/useCars";
 
 // Import car images
 import carBmw from "@/assets/car-bmw.jpg";
 import carMercedes from "@/assets/car-mercedes.jpg";
 import carAudi from "@/assets/car-audi.jpg";
 import carTesla from "@/assets/car-tesla.jpg";
-
-interface Car {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  category: string;
-  transmission: string;
-  fuel: string;
-  seats: number;
-  available: boolean;
-}
+import { Car } from "@/types/car";
 
 const defaultCars: Car[] = [
   {
@@ -75,31 +65,27 @@ const defaultCars: Car[] = [
 ];
 
 const Index = () => {
-  const [cars, setCars] = useState<Car[]>(defaultCars);
-  const [filteredCars, setFilteredCars] = useState<Car[]>(defaultCars);
+  const { cars, loading } = useCars();
+  const [filteredCars, setFilteredCars] = useState<Car[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
 
+  // Inicializar com dados padrão se não houver carros
   useEffect(() => {
-    // Load cars from localStorage and merge with defaults
-    const savedCars = localStorage.getItem("rental-cars");
-    if (savedCars) {
-      const parsedCars = JSON.parse(savedCars);
-      // Merge saved cars with default cars, avoiding duplicates
-      const mergedCars = [...defaultCars];
-      parsedCars.forEach((savedCar: Car) => {
-        if (!mergedCars.find(car => car.id === savedCar.id)) {
-          mergedCars.push(savedCar);
-        }
-      });
-      setCars(mergedCars);
-      setFilteredCars(mergedCars);
+    if (cars.length === 0 && !loading) {
+      // Se não há carros carregados da API, usar dados padrão do localStorage
+      const savedCars = localStorage.getItem("rental-cars");
+      if (!savedCars) {
+        // Salvar carros padrão no localStorage se não existirem
+        localStorage.setItem("rental-cars", JSON.stringify(defaultCars));
+      }
     }
-  }, []);
+  }, [cars, loading]);
 
+  // Filtrar carros com base nos critérios
   useEffect(() => {
-    let filtered = cars;
+    let filtered = cars.length > 0 ? cars : defaultCars;
 
     // Search filter
     if (searchTerm) {
@@ -124,8 +110,9 @@ const Index = () => {
     setFilteredCars(filtered);
   }, [cars, searchTerm, categoryFilter, availabilityFilter]);
 
-  const categories = [...new Set(cars.map(car => car.category))];
-  const availableCars = cars.filter(car => car.available).length;
+  const allCars = cars.length > 0 ? cars : defaultCars;
+  const categories = [...new Set(allCars.map(car => car.category))];
+  const availableCars = allCars.filter(car => car.available).length;
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -143,7 +130,7 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Button size="xl" variant="premium" className="min-w-48">
-              <Car className="w-5 h-5 mr-2" />
+              <CarIcon className="w-5 h-5 mr-2" />
               Ver Carros Disponíveis
             </Button>
             <Button size="xl" variant="hero" className="min-w-48">
@@ -154,8 +141,15 @@ const Index = () => {
           
           <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Car className="w-4 h-4 text-primary" />
-              <span>{cars.length} carros no estoque</span>
+              <CarIcon className="w-4 h-4 text-primary" />
+              {loading ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Carregando carros...</span>
+                </div>
+              ) : (
+                <span>{allCars.length} carros no estoque</span>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
@@ -215,7 +209,14 @@ const Index = () => {
 
       {/* Cars Grid */}
       <main className="container mx-auto px-4 py-12">
-        {filteredCars.length > 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <p className="text-lg text-muted-foreground">Carregando carros...</p>
+            </div>
+          </div>
+        ) : filteredCars.length > 0 ? (
           <>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold">
@@ -256,7 +257,7 @@ const Index = () => {
       </main>
 
       {/* Call to Action for Admin */}
-      {cars.length <= 4 && (
+      {allCars.length <= 4 && (
         <section className="py-16 px-4 bg-gradient-secondary">
           <div className="container mx-auto text-center">
             <h3 className="text-2xl font-bold mb-4">Gerencie Seu Estoque</h3>
@@ -278,7 +279,7 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Car className="w-6 h-6 text-primary" />
+                <CarIcon className="w-6 h-6 text-primary" />
                 <span className="text-xl font-bold">RentCar</span>
               </div>
               <p className="text-muted-foreground">

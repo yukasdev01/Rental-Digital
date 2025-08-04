@@ -1,38 +1,21 @@
-import { useState, useEffect } from "react";
 import { Header } from "@/components/Header";
 import { AddCarForm } from "@/components/AddCarForm";
 import { CarCard } from "@/components/CarCard";
+import { EditCarDialog } from "@/components/EditCarDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Car, DollarSign, Users } from "lucide-react";
-
-interface Car {
-  id: string;
-  name: string;
-  image: string;
-  price: number;
-  category: string;
-  transmission: string;
-  fuel: string;
-  seats: number;
-  available: boolean;
-}
+import { Button } from "@/components/ui/button";
+import { BarChart3, Car as CarIcon, DollarSign, Users, Loader2, Trash2 } from "lucide-react";
+import { useCars } from "@/hooks/useCars";
+import { Car } from "@/types/car";
 
 const Admin = () => {
-  const [cars, setCars] = useState<Car[]>([]);
+  const { cars, loading, deleteCar } = useCars();
 
-  useEffect(() => {
-    // Load cars from localStorage
-    const savedCars = localStorage.getItem("rental-cars");
-    if (savedCars) {
-      setCars(JSON.parse(savedCars));
+  const handleDeleteCar = async (id: string) => {
+    if (confirm('Tem certeza que deseja remover este carro?')) {
+      await deleteCar(id);
     }
-  }, []);
-
-  const handleAddCar = (newCar: Car) => {
-    const updatedCars = [...cars, newCar];
-    setCars(updatedCars);
-    localStorage.setItem("rental-cars", JSON.stringify(updatedCars));
   };
 
   const stats = {
@@ -59,7 +42,7 @@ const Admin = () => {
           <Card className="bg-card/50 backdrop-blur-sm border-border/50">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Carros</CardTitle>
-              <Car className="h-4 w-4 text-muted-foreground" />
+              <CarIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalCars}</div>
@@ -111,11 +94,18 @@ const Admin = () => {
 
         {/* Add Car Form */}
         <div className="mb-8">
-          <AddCarForm onAddCar={handleAddCar} />
+          <AddCarForm />
         </div>
 
         {/* Cars Inventory */}
-        {cars.length > 0 && (
+        {loading ? (
+          <div className="flex items-center justify-center py-16">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <p className="text-lg text-muted-foreground">Carregando carros...</p>
+            </div>
+          </div>
+        ) : cars.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Estoque de Carros</h2>
@@ -126,16 +116,29 @@ const Admin = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {cars.map((car) => (
-                <CarCard key={car.id} {...car} />
+                <div key={car.id} className="relative group">
+                  <CarCard {...car} />
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <EditCarDialog car={car} />
+                    <Button
+                      size="icon"
+                      variant="destructive"
+                      className="h-8 w-8"
+                      onClick={() => handleDeleteCar(car.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
-        )}
+        ) : null}
         
-        {cars.length === 0 && (
+        {!loading && cars.length === 0 && (
           <Card className="bg-card/50 backdrop-blur-sm border-border/50 text-center py-12">
             <CardContent>
-              <Car className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <CarIcon className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
               <CardTitle className="text-xl mb-2">Nenhum carro no estoque</CardTitle>
               <CardDescription>
                 Adicione o primeiro carro ao estoque usando o formulário acima
