@@ -1,0 +1,93 @@
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Car, Users, Fuel, Settings } from "lucide-react";
+
+interface CarCardProps {
+  id: string;
+  name: string;
+  image: string;
+  price: number;
+  category: string;
+  transmission: string;
+  fuel: string;
+  seats: number;
+  available: boolean;
+}
+
+export const CarCard = ({ 
+  id, 
+  name, 
+  image, 
+  price, 
+  category, 
+  transmission, 
+  fuel, 
+  seats, 
+  available 
+}: CarCardProps) => {
+  return (
+    <Card className="group overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-smooth hover:shadow-card">
+      <CardHeader className="p-0">
+        <div className="relative overflow-hidden rounded-t-lg">
+          <img 
+            src={image} 
+            alt={name}
+            className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
+          />
+          <div className="absolute top-3 right-3">
+            <Badge variant={available ? "default" : "secondary"} className="backdrop-blur-sm">
+              {available ? "Disponível" : "Indisponível"}
+            </Badge>
+          </div>
+          <div className="absolute top-3 left-3">
+            <Badge variant="outline" className="backdrop-blur-sm bg-background/20">
+              {category}
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent className="p-4">
+        <CardTitle className="text-xl mb-3 group-hover:text-primary transition-smooth">
+          {name}
+        </CardTitle>
+        
+        <div className="grid grid-cols-3 gap-3 text-sm text-muted-foreground mb-4">
+          <div className="flex items-center gap-1">
+            <Users className="w-4 h-4" />
+            <span>{seats} pessoas</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Settings className="w-4 h-4" />
+            <span>{transmission}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Fuel className="w-4 h-4" />
+            <span>{fuel}</span>
+          </div>
+        </div>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-2xl font-bold text-primary">
+              R$ {price}
+            </span>
+            <span className="text-muted-foreground ml-1">/dia</span>
+          </div>
+        </div>
+      </CardContent>
+      
+      <CardFooter className="p-4 pt-0">
+        <Button 
+          className="w-full" 
+          variant="premium"
+          disabled={!available}
+        >
+          <Car className="w-4 h-4 mr-2" />
+          {available ? "Alugar Agora" : "Indisponível"}
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
