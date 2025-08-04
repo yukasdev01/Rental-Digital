@@ -1,7 +1,8 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Car, Users, Fuel, Settings } from "lucide-react";
+import { Car, Users, Fuel, Settings, Eye } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface CarCardProps {
   id: string;
@@ -78,15 +79,24 @@ export const CarCard = ({
         </div>
       </CardContent>
       
-      <CardFooter className="p-4 pt-0">
-        <Button 
-          className="w-full" 
-          variant="premium"
-          disabled={!available}
-        >
-          <Car className="w-4 h-4 mr-2" />
-          {available ? "Alugar Agora" : "Indisponível"}
-        </Button>
+      <CardFooter className="p-4 pt-0 space-y-2">
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <Link to={`/car/${id}`}>
+            <Button variant="outline" size="sm" className="w-full">
+              <Eye className="w-4 h-4 mr-2" />
+              Ver Detalhes
+            </Button>
+          </Link>
+          <Button 
+            size="sm"
+            variant="premium"
+            disabled={!available}
+            className="w-full"
+          >
+            <Car className="w-4 h-4 mr-2" />
+            {available ? "Alugar" : "Indisponível"}
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

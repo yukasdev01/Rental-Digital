@@ -7,10 +7,14 @@ export const carService = {
     try {
       return await apiService.get<Car[]>('/cars');
     } catch (error) {
-      console.error('Erro ao buscar carros:', error);
+      console.error('Erro ao buscar carros da API, carregando do localStorage:', error);
       // Fallback para dados locais em caso de erro
       const savedCars = localStorage.getItem('rental-cars');
-      return savedCars ? JSON.parse(savedCars) : [];
+      if (savedCars) {
+        console.log('Carros carregados do localStorage:', JSON.parse(savedCars));
+        return JSON.parse(savedCars);
+      }
+      return [];
     }
   },
 
@@ -74,7 +78,20 @@ export const carService = {
       
       return updatedCar;
     } catch (error) {
-      console.error('Erro ao atualizar carro:', error);
+      console.error('Erro ao atualizar carro na API, atualizando localStorage:', error);
+      
+      // Fallback para localStorage em caso de erro da API
+      const savedCars = localStorage.getItem('rental-cars');
+      if (savedCars) {
+        const cars = JSON.parse(savedCars);
+        const carIndex = cars.findIndex((car: Car) => car.id === carData.id);
+        if (carIndex !== -1) {
+          const updatedCar: Car = { ...cars[carIndex], ...carData, updatedAt: new Date().toISOString() };
+          cars[carIndex] = updatedCar;
+          localStorage.setItem('rental-cars', JSON.stringify(cars));
+          return updatedCar;
+        }
+      }
       return null;
     }
   },
@@ -94,7 +111,16 @@ export const carService = {
       
       return true;
     } catch (error) {
-      console.error('Erro ao deletar carro:', error);
+      console.error('Erro ao deletar carro da API, removendo do localStorage:', error);
+      
+      // Fallback para localStorage em caso de erro da API
+      const savedCars = localStorage.getItem('rental-cars');
+      if (savedCars) {
+        const cars = JSON.parse(savedCars);
+        const filteredCars = cars.filter((car: Car) => car.id !== id);
+        localStorage.setItem('rental-cars', JSON.stringify(filteredCars));
+        return true;
+      }
       return false;
     }
   },
