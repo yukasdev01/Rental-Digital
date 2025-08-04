@@ -282,7 +282,7 @@ const Index = () => {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <CarIcon className="w-6 h-6 text-primary" />
-                <span className="text-xl font-bold">RentCar</span>
+                <span className="text-xl font-bold">DigitalRent</span>
               </div>
               <p className="text-muted-foreground">
                 A melhor plataforma de aluguel de carros premium do Brasil.
@@ -298,7 +298,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
-                  <span>contato@rentcar.com</span>
+                  <span>contato@digitalrent.com</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4" />
@@ -321,7 +321,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-border/20 mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 RentCar. Todos os direitos reservados.</p>
+            <p>&copy; 2024 DigitalRent. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>
