@@ -15,7 +15,7 @@ import carBmw from "@/assets/car-bmw.jpg";
 import carMercedes from "@/assets/car-mercedes.jpg";
 import carAudi from "@/assets/car-audi.jpg";
 import carTesla from "@/assets/car-tesla.jpg";
-import { Car } from "@/types/car";
+import type { Car } from "@/types/car";
 
 const defaultCars: Car[] = [
   {
