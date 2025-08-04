@@ -15,6 +15,8 @@ export const useCars = () => {
     setError(null);
     try {
       const data = await carService.getAllCars();
+
+      console.log('Carros carregados:', data);
       setCars(data);
     } catch (err) {
       const errorMessage = 'Erro ao carregar carros';

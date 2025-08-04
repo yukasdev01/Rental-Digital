@@ -66,26 +66,27 @@ const defaultCars: Car[] = [
 
 const Index = () => {
   const { cars, loading } = useCars();
+
   const [filteredCars, setFilteredCars] = useState<Car[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
 
   // Inicializar com dados padrão se não houver carros
-  useEffect(() => {
-    if (cars.length === 0 && !loading) {
-      // Se não há carros carregados da API, usar dados padrão do localStorage
-      const savedCars = localStorage.getItem("rental-cars");
-      if (!savedCars) {
-        // Salvar carros padrão no localStorage se não existirem
-        localStorage.setItem("rental-cars", JSON.stringify(defaultCars));
-      }
-    }
-  }, [cars, loading]);
+  // useEffect(() => {
+    // if (cars.length === 0 && !loading) {
+    //   // Se não há carros carregados da API, usar dados padrão do localStorage
+    //   const savedCars = localStorage.getItem("rental-cars");
+    //   if (!savedCars) {
+    //     // Salvar carros padrão no localStorage se não existirem
+    //     localStorage.setItem("rental-cars", JSON.stringify(defaultCars));
+    //   }
+    // }
+  // }, [cars, loading]);
 
   // Filtrar carros com base nos critérios
   useEffect(() => {
-    let filtered = cars.length > 0 ? cars : defaultCars;
+    let filtered = cars.length > 0 ? cars : cars;
 
     // Search filter
     if (searchTerm) {
@@ -110,7 +111,8 @@ const Index = () => {
     setFilteredCars(filtered);
   }, [cars, searchTerm, categoryFilter, availabilityFilter]);
 
-  const allCars = cars.length > 0 ? cars : defaultCars;
+  const allCars = cars.length > 0 ? cars : cars;
+
   const categories = [...new Set(allCars.map(car => car.category))];
   const availableCars = allCars.filter(car => car.available).length;
 
@@ -216,7 +218,7 @@ const Index = () => {
               <p className="text-lg text-muted-foreground">Carregando carros...</p>
             </div>
           </div>
-        ) : filteredCars.length > 0 ? (
+        ) : allCars.length > 0 ? (
           <>
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold">
