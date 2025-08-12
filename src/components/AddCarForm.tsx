@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Upload, Loader2 } from "lucide-react";
@@ -125,66 +124,71 @@ export const AddCarForm = ({ onAddCar }: AddCarFormProps) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category">Categoria *</Label>
-              <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
-                <SelectTrigger className="bg-background/50">
-                  <SelectValue placeholder="Selecione a categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="SUV">SUV</SelectItem>
-                  <SelectItem value="Sedan">Sedan</SelectItem>
-                  <SelectItem value="Hatchback">Hatchback</SelectItem>
-                  <SelectItem value="Luxury">Luxury</SelectItem>
-                  <SelectItem value="Sports">Sports</SelectItem>
-                  <SelectItem value="Electric">Electric</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                id="category"
+                value={formData.category}
+                onChange={(e) => handleInputChange("category", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                required
+              >
+                <option value="">Selecione a categoria</option>
+                <option value="SUV">SUV</option>
+                <option value="Sedan">Sedan</option>
+                <option value="Hatchback">Hatchback</option>
+                <option value="Luxury">Luxury</option>
+                <option value="Sports">Sports</option>
+                <option value="Electric">Electric</option>
+              </select>
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="transmission">Transmissão</Label>
-              <Select value={formData.transmission} onValueChange={(value) => handleInputChange("transmission", value)}>
-                <SelectTrigger className="bg-background/50">
-                  <SelectValue placeholder="Tipo de transmissão" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Automático">Automático</SelectItem>
-                  <SelectItem value="Manual">Manual</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                id="transmission"
+                value={formData.transmission}
+                onChange={(e) => handleInputChange("transmission", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Tipo de transmissão</option>
+                <option value="Automático">Automático</option>
+                <option value="Manual">Manual</option>
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="fuel">Combustível</Label>
-              <Select value={formData.fuel} onValueChange={(value) => handleInputChange("fuel", value)}>
-                <SelectTrigger className="bg-background/50">
-                  <SelectValue placeholder="Tipo de combustível" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Gasolina">Gasolina</SelectItem>
-                  <SelectItem value="Etanol">Etanol</SelectItem>
-                  <SelectItem value="Flex">Flex</SelectItem>
-                  <SelectItem value="Diesel">Diesel</SelectItem>
-                  <SelectItem value="Elétrico">Elétrico</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                id="fuel"
+                value={formData.fuel}
+                onChange={(e) => handleInputChange("fuel", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Tipo de combustível</option>
+                <option value="Gasolina">Gasolina</option>
+                <option value="Etanol">Etanol</option>
+                <option value="Flex">Flex</option>
+                <option value="Diesel">Diesel</option>
+                <option value="Elétrico">Elétrico</option>
+              </select>
             </div>
             
             <div className="space-y-2">
               <Label htmlFor="seats">Número de Assentos</Label>
-              <Select value={formData.seats} onValueChange={(value) => handleInputChange("seats", value)}>
-                <SelectTrigger className="bg-background/50">
-                  <SelectValue placeholder="Quantidade de assentos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="2">2 assentos</SelectItem>
-                  <SelectItem value="4">4 assentos</SelectItem>
-                  <SelectItem value="5">5 assentos</SelectItem>
-                  <SelectItem value="7">7 assentos</SelectItem>
-                  <SelectItem value="8">8 assentos</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                id="seats"
+                value={formData.seats}
+                onChange={(e) => handleInputChange("seats", e.target.value)}
+                className="flex h-10 w-full rounded-md border border-input bg-background/50 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Quantidade de assentos</option>
+                <option value="2">2 assentos</option>
+                <option value="4">4 assentos</option>
+                <option value="5">5 assentos</option>
+                <option value="7">7 assentos</option>
+                <option value="8">8 assentos</option>
+              </select>
             </div>
           </div>
 
